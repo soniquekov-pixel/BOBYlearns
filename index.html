@@ -59,13 +59,15 @@
         </div>
 
         <div class="menu">
+            <!-- ГОРЕН РЕД -->
             <div class="row-box" style="background: rgba(155, 89, 182, 0.1);">
                 <button style="background:var(--purple)" onclick="changeLevel(['и', 'к'], 'Горен', this)">ПОКАЗАЛЦИ <span>И К</span></button>
                 <button style="background:var(--purple)" onclick="changeLevel(['е', 'с'], 'Горен', this)">СРЕДНИ <span>Е С</span></button>
                 <button style="background:var(--purple)" onclick="changeLevel(['у', 'д'], 'Горен', this)">БЕЗИМЕННИ <span>У Д</span></button>
-                <button style="background:var(--purple)" onclick="changeLevel(['з', 'ц'], 'Горен', this)">КУТРЕТА <span>З Ц</span></button>
+                <button style="background:var(--purple)" onclick="changeLevel(['з', ',', 'ц'], 'Горен', this)">КУТРЕТА <span>З , Ц</span></button>
                 <button class="test-btn" onclick="startTest('top', this)">🏁 ТЕСТ <span>ГОРЕН</span></button>
             </div>
+            <!-- ОСНОВЕН РЕД -->
             <div class="row-box" style="background: rgba(52, 152, 219, 0.1);">
                 <button style="background:var(--accent)" onclick="changeLevel(['о', 'т'], 'Основен', this)">ПОКАЗАЛЦИ <span>О Т</span></button>
                 <button style="background:var(--accent)" onclick="changeLevel(['н', 'а'], 'Основен', this)">СРЕДНИ <span>Н А</span></button>
@@ -73,6 +75,7 @@
                 <button style="background:var(--accent)" onclick="changeLevel(['м', 'ь', 'ч'], 'Основен', this)">КУТРЕТА <span>М Ь Ч</span></button>
                 <button class="test-btn" onclick="startTest('mid', this)">🏁 ТЕСТ <span>СИН</span></button>
             </div>
+            <!-- ДОЛЕН РЕД -->
             <div class="row-box" style="background: rgba(22, 160, 133, 0.1);">
                 <button style="background:var(--teal)" onclick="changeLevel(['э', 'ф', 'х', 'п'], 'Долен', this)">ПОКАЗАЛЦИ <span>Э Ф Х П</span></button>
                 <button style="background:var(--teal)" onclick="changeLevel(['ъ', 'р'], 'Долен', this)">СРЕДНИ <span>Ъ Р</span></button>
@@ -86,7 +89,7 @@
 
 <script>
     const layouts = {
-        'Горен': ['я', 'у', 'е', 'и', 'ш', '|', 'щ', 'к', 'с', 'д', 'з', 'ц'],
+        'Горен': ['я', 'у', 'е', 'и', 'ш', '|', 'щ', 'к', 'с', 'д', 'з', 'ц', ','],
         'Основен': ['ь', 'я', 'а', 'о', 'ж', '|', 'г', 'т', 'н', 'в', 'м', 'ч'],
         'Долен': ['ю', 'ъ', 'э', 'ф', 'х', '|', 'п', 'р', 'л', 'з', 'й', 'б']
     };
@@ -129,7 +132,7 @@
             } else {
                 const key = document.createElement('div');
                 key.className = 'v-key';
-                key.id = 'vkey-' + char;
+                key.id = 'vkey-' + (char === ',' ? 'comma' : char);
                 key.innerText = char.toUpperCase();
                 container.appendChild(key);
             }
@@ -145,23 +148,18 @@
         }
 
         typedInString = '';
-        
         if (successCount < 10) {
-            // Етап 1: Симетрично
             targetString = currentLetters[successCount % currentLetters.length];
             document.getElementById('hint').innerText = "Стъпка 1: Симетрично учене";
         } else if (successCount < 25) {
-            // Етап 2: Разбъркано
             targetString = currentLetters[Math.floor(Math.random() * currentLetters.length)];
             document.getElementById('hint').innerText = "Стъпка 2: Разбъркани букви";
         } else {
-            // Етап 3: Срички (Комбинации)
             let c1 = currentLetters[Math.floor(Math.random() * currentLetters.length)];
             let c2 = currentLetters[Math.floor(Math.random() * currentLetters.length)];
             targetString = c1 + c2;
             document.getElementById('hint').innerText = "Стъпка 3: Комбинации (Срички)";
         }
-        
         updateDisplay();
     }
 
@@ -172,11 +170,10 @@
         setTimeout(() => display.classList.remove('pulse'), 300);
 
         document.querySelectorAll('.v-key').forEach(k => k.classList.remove('active'));
-        // Светим първата буква, която трябва да се натисне
         const nextCharToHit = targetString[typedInString.length];
-        const activeKey = document.getElementById('vkey-' + nextCharToHit);
+        const keyId = nextCharToHit === ',' ? 'vkey-comma' : 'vkey-' + nextCharToHit;
+        const activeKey = document.getElementById(keyId);
         if (activeKey) activeKey.classList.add('active');
-        
         document.getElementById('progress-bar').innerText = successCount;
     }
 
@@ -189,17 +186,16 @@
             if (pressed === expected) {
                 typedInString += pressed;
                 if (typedInString.length === targetString.length) {
-                    successCount += targetString.length; // Броим всяка буква
+                    successCount += targetString.length;
                     nextTask();
                 } else {
-                    // Още букви остават в сричката - само обновяваме светещия клавиш
                     document.querySelectorAll('.v-key').forEach(k => k.classList.remove('active'));
                     const nextChar = targetString[typedInString.length];
-                    document.getElementById('vkey-' + nextChar).classList.add('active');
+                    const keyId = nextChar === ',' ? 'vkey-comma' : 'vkey-' + nextChar;
+                    document.getElementById(keyId).classList.add('active');
                 }
             } else if (e.key.length === 1) showError();
         } else if (mode === 'test') {
-            // Логика за тест... (без промяна)
             if (!startTime && e.key.length === 1) startTime = Date.now();
             if (e.key === 'Enter') {
                 e.preventDefault();
