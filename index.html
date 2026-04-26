@@ -7,9 +7,9 @@
         body { font-family: 'Segoe UI', sans-serif; text-align: center; background: var(--bg); margin: 0; padding: 10px; }
         #container { max-width: 950px; margin: auto; background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
         
-        #target-display { font-size: 110px; font-weight: bold; color: var(--accent); height: 140px; display: flex; align-items: center; justify-content: center; margin: 10px 0; }
+        #target-display { font-size: 110px; font-weight: bold; color: var(--accent); height: 140px; display: flex; align-items: center; justify-content: center; margin: 10px 0; letter-spacing: 10px; }
         .pulse { animation: pulseAni 0.3s ease-out; }
-        @keyframes pulseAni { 0% {transform: scale(1);} 50% {transform: scale(1.15); color: #e67e22;} 100% {transform: scale(1);} }
+        @keyframes pulseAni { 0% {transform: scale(1);} 50% {transform: scale(1.1); color: #e67e22;} 100% {transform: scale(1);} }
 
         #kb-container { display: flex; justify-content: center; gap: 8px; margin: 15px 0; background: #eee; padding: 15px; border-radius: 12px; min-height: 65px; border: 2px solid #ddd; }
         .v-key { width: 55px; height: 55px; background: white; border: 2px solid #ccc; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: bold; transition: 0.2s; }
@@ -41,11 +41,10 @@
 
 <div id="container">
     <h1>🏁 ТРЕНАЖОРЪТ НА БОБИ</h1>
-    
     <div id="finish-msg">🌟 БРАВО, БОБИ! ТИ СИ ГОТОВ! <br> СЕГА ИЗБЕРИ ДРУГИ ПРЪСТИ! 🌟</div>
 
     <div id="game-ui">
-        <div id="stats-container" class="stats">Успешни опити: <span id="progress-bar">0</span> / 25</div>
+        <div id="stats-container" class="stats">Прогрес: <span id="progress-bar">0</span> / 40</div>
         
         <div id="practice-display-group">
             <div id="target-display">?</div>
@@ -60,7 +59,6 @@
         </div>
 
         <div class="menu">
-            <!-- ГОРЕН РЕД -->
             <div class="row-box" style="background: rgba(155, 89, 182, 0.1);">
                 <button style="background:var(--purple)" onclick="changeLevel(['и', 'к'], 'Горен', this)">ПОКАЗАЛЦИ <span>И К</span></button>
                 <button style="background:var(--purple)" onclick="changeLevel(['е', 'с'], 'Горен', this)">СРЕДНИ <span>Е С</span></button>
@@ -68,8 +66,6 @@
                 <button style="background:var(--purple)" onclick="changeLevel(['з', 'ц'], 'Горен', this)">КУТРЕТА <span>З Ц</span></button>
                 <button class="test-btn" onclick="startTest('top', this)">🏁 ТЕСТ <span>ГОРЕН</span></button>
             </div>
-
-            <!-- ОСНОВЕН РЕД -->
             <div class="row-box" style="background: rgba(52, 152, 219, 0.1);">
                 <button style="background:var(--accent)" onclick="changeLevel(['о', 'т'], 'Основен', this)">ПОКАЗАЛЦИ <span>О Т</span></button>
                 <button style="background:var(--accent)" onclick="changeLevel(['н', 'а'], 'Основен', this)">СРЕДНИ <span>Н А</span></button>
@@ -77,8 +73,6 @@
                 <button style="background:var(--accent)" onclick="changeLevel(['м', 'ь', 'ч'], 'Основен', this)">КУТРЕТА <span>М Ь Ч</span></button>
                 <button class="test-btn" onclick="startTest('mid', this)">🏁 ТЕСТ <span>СИН</span></button>
             </div>
-
-            <!-- ДОЛЕН РЕД -->
             <div class="row-box" style="background: rgba(22, 160, 133, 0.1);">
                 <button style="background:var(--teal)" onclick="changeLevel(['э', 'ф', 'х', 'п'], 'Долен', this)">ПОКАЗАЛЦИ <span>Э Ф Х П</span></button>
                 <button style="background:var(--teal)" onclick="changeLevel(['ъ', 'р'], 'Долен', this)">СРЕДНИ <span>Ъ Р</span></button>
@@ -105,10 +99,10 @@
 
     let mode = 'practice';
     let currentLetters = [];
-    let targetLetter = '';
+    let targetString = '';
+    let typedInString = '';
     let successCount = 0;
     let startTime = null;
-    let activeTestString = "";
 
     function changeLevel(letters, rowName, btn) {
         mode = 'practice';
@@ -118,9 +112,8 @@
         document.getElementById('practice-display-group').style.display = 'block';
         document.getElementById('speed-test-view').style.display = 'none';
         document.getElementById('stats-container').style.display = 'inline-block';
-        
-        document.querySelectorAll('button').forEach(b => b.classList.remove('active-mode'));
-        btn.classList.add('active-mode');
+        document.querySelectorAll('button').forEach(b => b.classList.remove('active-btn'));
+        btn.classList.add('active-btn');
         buildKeyboard(rowName);
         nextTask();
     }
@@ -144,62 +137,69 @@
     }
 
     function nextTask() {
-        if (successCount >= 25) {
+        if (successCount >= 40) {
             document.getElementById('finish-msg').style.display = 'block';
             document.getElementById('practice-display-group').style.display = 'none';
             document.getElementById('stats-container').style.display = 'none';
-            targetLetter = '';
             return;
         }
 
-        if (successCount < 10 && currentLetters.length > 1) {
-            targetLetter = currentLetters[successCount % 2];
-            document.getElementById('hint').innerText = "Симетрично: " + currentLetters.join(' - ').toUpperCase();
+        typedInString = '';
+        
+        if (successCount < 10) {
+            // Етап 1: Симетрично
+            targetString = currentLetters[successCount % currentLetters.length];
+            document.getElementById('hint').innerText = "Стъпка 1: Симетрично учене";
+        } else if (successCount < 25) {
+            // Етап 2: Разбъркано
+            targetString = currentLetters[Math.floor(Math.random() * currentLetters.length)];
+            document.getElementById('hint').innerText = "Стъпка 2: Разбъркани букви";
         } else {
-            let newLetter;
-            do {
-                newLetter = currentLetters[Math.floor(Math.random() * currentLetters.length)];
-            } while (newLetter === targetLetter && currentLetters.length > 1);
-            targetLetter = newLetter;
-            document.getElementById('hint').innerText = "Разбъркано!";
+            // Етап 3: Срички (Комбинации)
+            let c1 = currentLetters[Math.floor(Math.random() * currentLetters.length)];
+            let c2 = currentLetters[Math.floor(Math.random() * currentLetters.length)];
+            targetString = c1 + c2;
+            document.getElementById('hint').innerText = "Стъпка 3: Комбинации (Срички)";
         }
         
-        document.getElementById('target-display').innerText = targetLetter.toUpperCase();
-        document.getElementById('target-display').classList.add('pulse');
-        setTimeout(() => document.getElementById('target-display').classList.remove('pulse'), 300);
-
-        document.querySelectorAll('.v-key').forEach(k => k.classList.remove('active'));
-        const activeKey = document.getElementById('vkey-' + targetLetter);
-        if (activeKey) activeKey.classList.add('active');
-        document.getElementById('progress-bar').innerText = successCount;
+        updateDisplay();
     }
 
-    function startTest(type, btn) {
-        mode = 'test';
-        activeTestString = testTexts[type];
-        startTime = null;
-        document.getElementById('practice-display-group').style.display = 'none';
-        document.getElementById('stats-container').style.display = 'none';
-        document.getElementById('finish-msg').style.display = 'none';
-        document.getElementById('speed-test-view').style.display = 'block';
-        document.getElementById('target-text').innerText = activeTestString;
-        document.getElementById('speed-result').innerText = "";
-        const box = document.getElementById('typing-box');
-        box.value = "";
-        setTimeout(() => box.focus(), 100);
+    function updateDisplay() {
+        const display = document.getElementById('target-display');
+        display.innerText = targetString.toUpperCase();
+        display.classList.add('pulse');
+        setTimeout(() => display.classList.remove('pulse'), 300);
+
+        document.querySelectorAll('.v-key').forEach(k => k.classList.remove('active'));
+        // Светим първата буква, която трябва да се натисне
+        const nextCharToHit = targetString[typedInString.length];
+        const activeKey = document.getElementById('vkey-' + nextCharToHit);
+        if (activeKey) activeKey.classList.add('active');
         
-        document.querySelectorAll('button').forEach(b => b.classList.remove('active-mode'));
-        btn.classList.add('active-mode');
+        document.getElementById('progress-bar').innerText = successCount;
     }
 
     window.onkeydown = function(e) {
         if (mode === 'practice') {
-            if (successCount >= 25) return;
-            if (e.key.toLowerCase() === targetLetter) {
-                successCount++;
-                nextTask();
+            if (successCount >= 40) return;
+            let pressed = e.key.toLowerCase();
+            let expected = targetString[typedInString.length];
+
+            if (pressed === expected) {
+                typedInString += pressed;
+                if (typedInString.length === targetString.length) {
+                    successCount += targetString.length; // Броим всяка буква
+                    nextTask();
+                } else {
+                    // Още букви остават в сричката - само обновяваме светещия клавиш
+                    document.querySelectorAll('.v-key').forEach(k => k.classList.remove('active'));
+                    const nextChar = targetString[typedInString.length];
+                    document.getElementById('vkey-' + nextChar).classList.add('active');
+                }
             } else if (e.key.length === 1) showError();
         } else if (mode === 'test') {
+            // Логика за тест... (без промяна)
             if (!startTime && e.key.length === 1) startTime = Date.now();
             if (e.key === 'Enter') {
                 e.preventDefault();
@@ -212,6 +212,20 @@
             }
         }
     };
+
+    function startTest(type, btn) {
+        mode = 'test';
+        activeTestString = testTexts[type];
+        startTime = null;
+        document.getElementById('practice-display-group').style.display = 'none';
+        document.getElementById('stats-container').style.display = 'none';
+        document.getElementById('finish-msg').style.display = 'none';
+        document.getElementById('speed-test-view').style.display = 'block';
+        document.getElementById('target-text').innerText = activeTestString;
+        document.querySelectorAll('button').forEach(b => b.classList.remove('active-btn'));
+        btn.classList.add('active-btn');
+        const box = document.getElementById('typing-box'); box.value = ""; setTimeout(() => box.focus(), 100);
+    }
 
     function showError() {
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
