@@ -3,160 +3,216 @@
 <head>
     <meta charset="UTF-8">
     <style>
-        :root { --accent: #3498db; --success: #27ae60; --bg: #f0f2f5; --error: #e74c3c; --dark: #2c3e50; --purple: #9b59b6; --teal: #16a085; }
-        body { font-family: 'Segoe UI', sans-serif; text-align: center; background: var(--bg); margin: 0; padding: 5px; }
-        #container { max-width: 1000px; margin: auto; background: white; padding: 20px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        :root { --accent: #3498db; --success: #27ae60; --bg: #f0f2f5; --error: #e74c3c; --dark: #2c3e50; --highlight: #f1c40f; --purple: #9b59b6; --teal: #16a085; }
+        body { font-family: 'Segoe UI', sans-serif; text-align: center; background: var(--bg); margin: 0; padding: 10px; }
+        #container { max-width: 950px; margin: auto; background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
         
-        /* Анимация за премигване */
-        @keyframes letterPop {
-            0% { transform: scale(1); color: var(--accent); }
-            50% { transform: scale(1.2); color: #e67e22; }
-            100% { transform: scale(1); color: var(--accent); }
-        }
-        .animate-pop { animation: letterPop 0.3s ease-out; }
+        #target-display { font-size: 110px; font-weight: bold; color: var(--accent); height: 140px; display: flex; align-items: center; justify-content: center; margin: 10px 0; }
+        .pulse { animation: pulseAni 0.3s ease-out; }
+        @keyframes pulseAni { 0% {transform: scale(1);} 50% {transform: scale(1.15); color: #e67e22;} 100% {transform: scale(1);} }
 
-        #practice-area { display: block; }
-        #target-display { font-size: 110px; color: var(--accent); height: 150px; font-weight: bold; display: flex; align-items: center; justify-content: center; background: #fafafa; border-radius: 15px; margin: 10px 0; border: 2px dashed #ddd; text-transform: uppercase; transition: all 0.2s; }
+        #kb-container { display: flex; justify-content: center; gap: 8px; margin: 15px 0; background: #eee; padding: 15px; border-radius: 12px; min-height: 65px; border: 2px solid #ddd; }
+        .v-key { width: 55px; height: 55px; background: white; border: 2px solid #ccc; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: bold; transition: 0.2s; }
+        .v-key.active { background: var(--highlight); border-color: #e67e22; transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .v-divider { width: 4px; background: #bbb; margin: 0 15px; border-radius: 2px; }
+
+        #speed-test-view { display: none; text-align: left; background: #fff; padding: 15px; border: 2px solid #ddd; border-radius: 10px; margin: 20px 0; }
+        #target-text { font-family: 'Courier New', monospace; font-size: 22px; color: #95a5a6; margin-bottom: 10px; line-height: 1.5; }
+        #typing-box { font-family: 'Courier New', monospace; font-size: 24px; width: 95%; height: 60px; padding: 10px; border: 3px solid var(--accent); border-radius: 8px; outline: none; }
+
+        .stats { font-size: 20px; color: var(--dark); margin-bottom: 10px; background: #e8f4fd; padding: 10px; border-radius: 10px; display: inline-block; }
+        .menu { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+        .row-box { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; padding: 10px; border-radius: 12px; }
         
-        #input-history { font-family: 'Courier New', monospace; font-size: 26px; letter-spacing: 5px; color: var(--dark); background: #e8f4fd; padding: 10px; border-radius: 10px; min-height: 35px; margin-bottom: 10px; border-left: 10px solid var(--accent); white-space: pre; overflow: hidden; text-transform: uppercase; }
-        #speed-test-area { display: none; text-align: left; }
-        #target-text-view { font-size: 22px; color: #95a5a6; background: #fff; padding: 15px; border-radius: 15px; border: 2px solid #ddd; line-height: 1.5; font-family: 'Courier New', monospace; margin-bottom: 10px; }
-        #typing-box { font-family: 'Courier New', monospace; font-size: 24px; width: 95%; height: 70px; padding: 10px; border: 3px solid var(--accent); border-radius: 10px; outline: none; resize: none; display: block; margin: 0 auto; }
-        #hint { font-size: 18px; color: #7f8c8d; height: 25px; margin-bottom: 5px; font-weight: bold; }
+        button { padding: 10px 15px; cursor: pointer; border: none; border-radius: 8px; color: white; font-weight: bold; font-size: 0.8em; transition: 0.2s; line-height: 1.3; min-width: 120px; }
+        button span { display: block; font-size: 1.2em; text-transform: uppercase; margin-top: 2px; }
+        button:hover { transform: scale(1.05); filter: brightness(1.1); }
+        .active-btn { outline: 4px solid var(--dark); }
+        .test-btn { background: #34495e !important; border: 1px solid white; min-width: 100px; }
         
-        .menu { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
-        .row-group { display: flex; align-items: center; gap: 8px; justify-content: center; border-radius: 10px; padding: 8px; }
-        button { padding: 8px 15px; cursor: pointer; border: none; border-radius: 8px; color: white; transition: 0.2s; font-size: 0.8em; line-height: 1.3; font-weight: bold; min-width: 120px; }
-        button span { display: block; font-size: 1.2em; text-transform: uppercase; margin-top: 2px; letter-spacing: 1px; }
-        button:hover { filter: brightness(1.1); transform: translateY(-1px); }
-        .active-mode { background: var(--dark) !important; box-shadow: inset 0 0 8px rgba(0,0,0,0.3); }
-        .btn-blue { background: var(--accent); }
-        .btn-purple { background: var(--purple); }
-        .btn-teal { background: var(--teal); }
-        .btn-test { font-style: italic; border: 1px solid rgba(255,255,255,0.3); }
-        .test-all { background: #f39c12 !important; font-size: 1.1em; padding: 15px; margin-top: 10px; width: 100%; max-width: 800px; margin-left: auto; margin-right: auto; }
+        #finish-msg { display: none; background: var(--success); color: white; padding: 25px; border-radius: 15px; margin: 20px 0; font-size: 1.6em; animation: bounce 0.5s; font-weight: bold; }
+        @keyframes bounce { 0%, 100% {transform: translateY(0);} 50% {transform: translateY(-10px);} }
         #error-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(231, 76, 60, 0.8); color: white; font-size: 300px; display: none; align-items: center; justify-content: center; z-index: 100; pointer-events: none; }
-        .result-popup { background: #ffd700; color: #000; padding: 20px; border-radius: 15px; margin: 15px 0; font-size: 1.3em; border: 5px solid var(--dark); text-align: center; }
-        .current-char { background: #f1c40f; color: black; }
     </style>
 </head>
 <body>
+
 <div id="error-overlay">X</div>
+
 <div id="container">
-    <div id="setup">
-        <h1>🏆 ШАМПИОНАТЪТ НА БОБИ</h1>
-        <button onclick="startApp()" style="padding: 15px 50px; font-size: 22px; background: var(--success); cursor:pointer; color:white; border:none; border-radius:10px;">ЗАПОЧНИ</button>
-    </div>
-    <div id="game" style="display:none">
-        <div id="practice-area">
-            <div id="input-history"></div>
-            <div id="target-display">?</div>
-        </div>
-        <div id="speed-test-area">
-            <div id="target-text-view"></div>
-            <textarea id="typing-box" spellcheck="false" placeholder="Пиши тук..."></textarea>
-            <div id="result-display" class="result-popup" style="display:none"></div>
-        </div>
-        <div id="hint">Подготви се...</div>
+    <h1>🏁 ТРЕНАЖОРЪТ НА БОБИ</h1>
+    
+    <div id="finish-msg">🌟 БРАВО, БОБИ! ТИ СИ ГОТОВ! <br> СЕГА ИЗБЕРИ ДРУГИ ПРЪСТИ! 🌟</div>
+
+    <div id="game-ui">
+        <div id="stats-container" class="stats">Успешни опити: <span id="progress-bar">0</span> / 25</div>
         
+        <div id="practice-display-group">
+            <div id="target-display">?</div>
+            <div id="hint" style="color: #7f8c8d; font-weight: bold; margin-bottom: 10px;">Избери ниво...</div>
+            <div id="kb-container"></div>
+        </div>
+
+        <div id="speed-test-view">
+            <div id="target-text"></div>
+            <textarea id="typing-box" spellcheck="false" placeholder="Пиши тук и натисни ENTER за край..."></textarea>
+            <div id="speed-result" style="margin-top:10px; font-weight:bold; color:var(--dark);"></div>
+        </div>
+
         <div class="menu">
-            <!-- ЛИЛАВ РЕД (ГОРЕН) -->
-            <div class="row-group" style="background: rgba(155, 89, 182, 0.1);">
-                <button class="btn-purple" onclick="changeLevel('char', ['и', 'к'], this)">ПОКАЗАЛЦИ <span>И К</span></button>
-                <button class="btn-purple" onclick="changeLevel('char', ['е', 'с'], this)">СРЕДНИ <span>Е С</span></button>
-                <button class="btn-purple" onclick="changeLevel('char', ['у', 'д'], this)">БЕЗИМЕННИ <span>У Д</span></button>
-                <button class="btn-purple" onclick="changeLevel('char', ['з'], this)">КУТРЕТА <span>З</span></button>
-                <button class="btn-purple btn-test" onclick="initSpeedTest('top', this)">🏁 ТЕСТ <span>ЛИЛАВ</span></button>
+            <!-- ГОРЕН РЕД -->
+            <div class="row-box" style="background: rgba(155, 89, 182, 0.1);">
+                <button style="background:var(--purple)" onclick="changeLevel(['и', 'к'], 'Горен', this)">ПОКАЗАЛЦИ <span>И К</span></button>
+                <button style="background:var(--purple)" onclick="changeLevel(['е', 'с'], 'Горен', this)">СРЕДНИ <span>Е С</span></button>
+                <button style="background:var(--purple)" onclick="changeLevel(['у', 'д'], 'Горен', this)">БЕЗИМЕННИ <span>У Д</span></button>
+                <button class="test-btn" onclick="startTest('top', this)">🏁 ТЕСТ <span>ГОРЕН</span></button>
             </div>
 
-            <!-- СИН РЕД (СРЕДЕН) -->
-            <div class="row-group" style="background: rgba(52, 152, 219, 0.1);">
-                <button class="btn-blue" onclick="changeLevel('char', ['о', 'т'], this)">ПОКАЗАЛЦИ <span>О Т</span></button>
-                <button class="btn-blue" onclick="changeLevel('char', ['н', 'а'], this)">СРЕДНИ <span>Н А</span></button>
-                <button class="btn-blue" onclick="changeLevel('char', ['в', 'я'], this)">БЕЗИМЕННИ <span>В Я</span></button>
-                <button class="btn-blue" onclick="changeLevel('char', ['м', 'ь', 'ч'], this)">КУТРЕТА <span>М Ь Ч</span></button>
-                <button class="btn-blue btn-test" onclick="initSpeedTest('mid', this)">🏁 ТЕСТ <span>СИН</span></button>
-            </div>
-            
-            <!-- ЗЕЛЕН РЕД (ДОЛЕН) -->
-            <div class="row-group" style="background: rgba(22, 160, 133, 0.1);">
-                <button class="btn-teal" onclick="changeLevel('char', ['э', 'ф', 'х', 'п'], this)">ПОКАЗАЛЦИ <span>Э Ф Х П</span></button>
-                <button class="btn-teal" onclick="changeLevel('char', ['ъ', 'р'], this)">СРЕДНИ <span>Ъ Р</span></button>
-                <button class="btn-teal" onclick="changeLevel('char', ['й', 'л'], this)">БЕЗИМЕННИ <span>Й Л</span></button>
-                <button class="btn-teal" onclick="changeLevel('char', ['ю', 'б'], this)">КУТРЕТА <span>Ю Б</span></button>
-                <button class="btn-teal btn-test" onclick="initSpeedTest('bot', this)">🏁 ТЕСТ <span>ЗЕЛЕН</span></button>
+            <!-- ОСНОВЕН РЕД -->
+            <div class="row-box" style="background: rgba(52, 152, 219, 0.1);">
+                <button style="background:var(--accent)" onclick="changeLevel(['о', 'т'], 'Основен', this)">ПОКАЗАЛЦИ <span>О Т</span></button>
+                <button style="background:var(--accent)" onclick="changeLevel(['н', 'а'], 'Основен', this)">СРЕДНИ <span>Н А</span></button>
+                <button style="background:var(--accent)" onclick="changeLevel(['в', 'я'], 'Основен', this)">БЕЗИМЕННИ <span>В Я</span></button>
+                <button style="background:var(--accent)" onclick="changeLevel(['м', 'ь', 'ч'], 'Основен', this)">КУТРЕТА <span>М Ь Ч</span></button>
+                <button class="test-btn" onclick="startTest('mid', this)">🏁 ТЕСТ <span>СИН</span></button>
             </div>
 
-            <button class="test-all" onclick="initSpeedTest('all', this)">🏎️ ГОЛЕМИЯТ ШАМПИОНАТ <span>ВСИЧКИ РЕДОВЕ</span></button>
+            <!-- ДОЛЕН РЕД -->
+            <div class="row-box" style="background: rgba(22, 160, 133, 0.1);">
+                <button style="background:var(--teal)" onclick="changeLevel(['э', 'ф', 'х', 'п'], 'Долен', this)">ПОКАЗАЛЦИ <span>Э Ф Х П</span></button>
+                <button style="background:var(--teal)" onclick="changeLevel(['ъ', 'р'], 'Долен', this)">СРЕДНИ <span>Ъ Р</span></button>
+                <button style="background:var(--teal)" onclick="changeLevel(['й', 'л'], 'Долен', this)">БЕЗИМЕННИ <span>Й Л</span></button>
+                <button class="test-btn" onclick="startTest('bot', this)">🏁 ТЕСТ <span>ЗЕЛЕН</span></button>
+            </div>
         </div>
     </div>
 </div>
+
 <script>
-    let mode = 'char'; let currentPool = []; let targetTask = ''; let startTime = null; let timerInterval = null; let activeTestText = "";
-    const texts = {
+    const layouts = {
+        'Горен': ['я', 'у', 'е', 'и', 'ш', '|', 'щ', 'к', 'с', 'д', 'з', 'ц'],
+        'Основен': ['ь', 'я', 'а', 'о', 'ж', '|', 'г', 'т', 'н', 'в', 'м', 'ч'],
+        'Долен': ['ю', 'ъ', 'э', 'ф', 'х', '|', 'п', 'р', 'л', 'з', 'й', 'б']
+    };
+
+    const testTexts = {
         mid: "ана вярва на таня. мачът на ваня е на гарата. мама готви на ната.",
         top: "кучето и котката скочиха. ще ядем ягоди и ябълки. тук е много шумно.",
-        bot: "лекар даде разни хапчета. зимата дойде бързо. пази хляба от прах.",
-        all: "бързото куче скочи над мързеливата котка. мама и тати отидоха на планина."
+        bot: "лекар даде разни хапчета. зимата дойде бързо. пази хляба от прах."
     };
-    function startApp() { document.getElementById('setup').style.display = 'none'; document.getElementById('game').style.display = 'block'; changeLevel('char', ['и', 'к'], document.querySelector('.menu button')); }
-    function changeLevel(newMode, data, btn) { clearInterval(timerInterval); mode = newMode; currentPool = data; document.getElementById('practice-area').style.display = 'block'; document.getElementById('speed-test-area').style.display = 'none'; document.getElementById('input-history').innerText = ""; document.getElementById('result-display').style.display = 'none'; document.querySelectorAll('button').forEach(b => b.classList.remove('active-mode')); btn.classList.add('active-mode'); nextTask(); }
-    
-    function nextTask() {
-        targetTask = currentPool[Math.floor(Math.random() * currentPool.length)];
-        const display = document.getElementById('target-display');
-        display.innerText = targetTask.toUpperCase();
+
+    let mode = 'practice';
+    let currentLetters = [];
+    let targetLetter = '';
+    let successCount = 0;
+    let startTime = null;
+    let activeTestString = "";
+
+    function changeLevel(letters, rowName, btn) {
+        mode = 'practice';
+        currentLetters = letters;
+        successCount = 0;
+        document.getElementById('finish-msg').style.display = 'none';
+        document.getElementById('practice-display-group').style.display = 'block';
+        document.getElementById('speed-test-view').style.display = 'none';
+        document.getElementById('stats-container').style.display = 'inline-block';
         
-        // Премахваме и добавяме анимацията, за да се задейства премигването
-        display.classList.remove('animate-pop');
-        void display.offsetWidth; // Малък трик за рестарт на CSS анимация
-        display.classList.add('animate-pop');
-        
-        document.getElementById('hint').innerText = "Пиши буквата...";
+        document.querySelectorAll('button').forEach(b => b.classList.remove('active-btn'));
+        btn.classList.add('active-btn');
+        buildKeyboard(rowName);
+        nextTask();
     }
 
-    function initSpeedTest(testType, btn) { clearInterval(timerInterval); mode = 'speedtest'; activeTestText = texts[testType]; startTime = null; document.getElementById('practice-area').style.display = 'none'; document.getElementById('speed-test-area').style.display = 'block'; document.getElementById('result-display').style.display = 'none'; document.getElementById('hint').innerText = "ENTER за край!"; document.querySelectorAll('button').forEach(b => b.classList.remove('active-mode')); btn.classList.add('active-mode'); const box = document.getElementById('typing-box'); box.value = ""; renderSpeedTarget(""); setTimeout(() => box.focus(), 50); }
-    function renderSpeedTarget(typed) {
-        let html = "";
-        for (let i = 0; i < activeTestText.length; i++) {
-            if (i < typed.length) {
-                let color = (typed[i] === activeTestText[i]) ? "color: #27ae60" : "color: #e74c3c; text-decoration: underline";
-                html += `<span style="${color}">${activeTestText[i]}</span>`;
-            } else if (i === typed.length) { html += `<span class="current-char">${activeTestText[i]}</span>`; }
-            else { html += `<span>${activeTestText[i]}</span>`; }
-        }
-        document.getElementById('target-text-view').innerHTML = html;
+    function buildKeyboard(rowName) {
+        const container = document.getElementById('kb-container');
+        container.innerHTML = '';
+        layouts[rowName].forEach(char => {
+            if (char === '|') {
+                const div = document.createElement('div');
+                div.className = 'v-divider';
+                container.appendChild(div);
+            } else {
+                const key = document.createElement('div');
+                key.className = 'v-key';
+                key.id = 'vkey-' + char;
+                key.innerText = char.toUpperCase();
+                container.appendChild(key);
+            }
+        });
     }
-    window.onkeydown = function(e) {
-        if (document.getElementById('game').style.display === 'none') return;
-        if (mode === 'speedtest') {
-            const box = document.getElementById('typing-box');
-            if (e.key === 'Enter') { e.preventDefault(); finishSpeedTest(); return; }
-            if (!startTime && e.key.length === 1) startTime = Date.now();
-            setTimeout(() => renderSpeedTarget(box.value), 10);
+
+    function nextTask() {
+        if (successCount >= 25) {
+            document.getElementById('finish-msg').style.display = 'block';
+            document.getElementById('practice-display-group').style.display = 'none';
+            document.getElementById('stats-container').style.display = 'none';
+            targetLetter = '';
             return;
         }
-        if (e.key.length > 1 && e.key !== ' ') return;
-        let pressed = e.key.toLowerCase();
-        if (pressed === targetTask) {
-            document.getElementById('input-history').innerText += pressed;
-            if (document.getElementById('input-history').innerText.length > 20) document.getElementById('input-history').innerText = "";
-            nextTask();
-        } else { showError(); }
-    };
-    function finishSpeedTest() {
-        if (!startTime) return;
-        const typed = document.getElementById('typing-box').value;
-        const totalMinutes = (Date.now() - startTime) / 60000;
-        let errors = 0;
-        for (let i = 0; i < activeTestText.length; i++) { if (typed[i] !== activeTestText[i]) errors++; }
-        let netHits = typed.length - (errors * 10);
-        if (netHits < 0) netHits = 0;
-        let wpm = Math.round(netHits / (totalMinutes || 1));
-        const res = document.getElementById('result-display');
-        res.style.display = 'block';
-        res.innerHTML = `🏁 <b>${wpm} удара/мин</b> <br><small>Удари: ${typed.length} | Грешки: ${errors}</small>`;
+
+        if (successCount < 10 && currentLetters.length > 1) {
+            targetLetter = currentLetters[successCount % 2];
+            document.getElementById('hint').innerText = "Симетрично: " + currentLetters.join(' - ').toUpperCase();
+        } else {
+            let newLetter;
+            do {
+                newLetter = currentLetters[Math.floor(Math.random() * currentLetters.length)];
+            } while (newLetter === targetLetter && currentLetters.length > 1);
+            targetLetter = newLetter;
+            document.getElementById('hint').innerText = "Разбъркано!";
+        }
+        
+        const display = document.getElementById('target-display');
+        display.innerText = targetLetter.toUpperCase();
+        display.classList.remove('pulse');
+        void display.offsetWidth;
+        display.classList.add('pulse');
+
+        document.querySelectorAll('.v-key').forEach(k => k.classList.remove('active'));
+        const activeKey = document.getElementById('vkey-' + targetLetter);
+        if (activeKey) activeKey.classList.add('active');
+        document.getElementById('progress-bar').innerText = successCount;
     }
+
+    function startTest(type, btn) {
+        mode = 'test';
+        activeTestString = testTexts[type];
+        startTime = null;
+        document.getElementById('practice-display-group').style.display = 'none';
+        document.getElementById('stats-container').style.display = 'none';
+        document.getElementById('finish-msg').style.display = 'none';
+        document.getElementById('speed-test-view').style.display = 'block';
+        document.getElementById('target-text').innerText = activeTestString;
+        document.getElementById('speed-result').innerText = "";
+        const box = document.getElementById('typing-box');
+        box.value = "";
+        setTimeout(() => box.focus(), 100);
+        
+        document.querySelectorAll('button').forEach(b => b.classList.remove('active-btn'));
+        btn.classList.add('active-btn');
+    }
+
+    window.onkeydown = function(e) {
+        if (mode === 'practice') {
+            if (successCount >= 25) return;
+            if (e.key.toLowerCase() === targetLetter) {
+                successCount++;
+                nextTask();
+            } else if (e.key.length === 1) showError();
+        } else if (mode === 'test') {
+            if (!startTime && e.key.length === 1) startTime = Date.now();
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const typed = document.getElementById('typing-box').value;
+                const time = (Date.now() - startTime) / 60000;
+                let err = 0;
+                for(let i=0; i<activeTestString.length; i++) if(typed[i] !== activeTestString[i]) err++;
+                let wpm = Math.round((typed.length - (err*10)) / time);
+                document.getElementById('speed-result').innerText = `РЕЗУЛТАТ: ${wpm < 0 ? 0 : wpm} удара/мин (Грешки: ${err})`;
+            }
+        }
+    };
+
     function showError() {
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         let osc = audioCtx.createOscillator(); osc.type = 'sawtooth'; osc.frequency.value = 130;
