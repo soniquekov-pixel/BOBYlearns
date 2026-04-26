@@ -4,166 +4,119 @@
     <meta charset="UTF-8">
     <style>
         :root { --accent: #3498db; --success: #27ae60; --bg: #f0f2f5; --error: #e74c3c; --dark: #2c3e50; --purple: #9b59b6; --teal: #16a085; }
-        body { font-family: 'Segoe UI', sans-serif; text-align: center; background: var(--bg); margin: 0; padding: 10px; }
-        #container { max-width: 950px; margin: auto; background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        body { font-family: 'Segoe UI', sans-serif; text-align: center; background: var(--bg); margin: 0; padding: 5px; }
+        #container { max-width: 1000px; margin: auto; background: white; padding: 20px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
         
         #practice-area { display: block; }
+        #target-display { font-size: 90px; color: var(--accent); height: 130px; font-weight: bold; display: flex; align-items: center; justify-content: center; background: #fafafa; border-radius: 15px; margin: 10px 0; border: 2px dashed #ddd; text-transform: uppercase; }
+        #input-history { font-family: 'Courier New', monospace; font-size: 26px; letter-spacing: 5px; color: var(--dark); background: #e8f4fd; padding: 10px; border-radius: 10px; min-height: 35px; margin-bottom: 10px; border-left: 10px solid var(--accent); white-space: pre; overflow: hidden; text-transform: uppercase; }
+        
         #speed-test-area { display: none; text-align: left; }
+        #target-text-view { font-size: 22px; color: #95a5a6; background: #fff; padding: 15px; border-radius: 15px; border: 2px solid #ddd; line-height: 1.5; font-family: 'Courier New', monospace; margin-bottom: 10px; }
+        #typing-box { font-family: 'Courier New', monospace; font-size: 24px; width: 95%; height: 70px; padding: 10px; border: 3px solid var(--accent); border-radius: 10px; outline: none; resize: none; display: block; margin: 0 auto; }
 
-        #target-display { font-size: 100px; color: var(--accent); height: 150px; font-weight: bold; display: flex; align-items: center; justify-content: center; background: #fafafa; border-radius: 15px; margin: 15px 0; border: 2px dashed #ddd; text-transform: uppercase; }
-        #input-history { font-family: 'Courier New', monospace; font-size: 28px; letter-spacing: 5px; color: var(--dark); background: #e8f4fd; padding: 15px; border-radius: 10px; min-height: 40px; margin-bottom: 15px; border-left: 10px solid var(--accent); white-space: pre; overflow: hidden; text-transform: uppercase; }
+        #hint { font-size: 18px; color: #7f8c8d; height: 25px; margin-bottom: 5px; font-weight: bold; }
         
-        #target-text-view { font-size: 24px; color: #95a5a6; background: #fff; padding: 20px; border-radius: 15px; border: 2px solid #ddd; line-height: 1.6; font-family: 'Courier New', monospace; margin-bottom: 15px; min-height: 50px; }
-        #typing-box { font-family: 'Courier New', monospace; font-size: 26px; width: 95%; height: 80px; padding: 10px; border: 3px solid var(--accent); border-radius: 10px; outline: none; resize: none; display: block; margin: 0 auto; }
-
-        #hint { font-size: 20px; color: #7f8c8d; height: 30px; margin-bottom: 10px; }
+        .menu { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+        .row-group { display: flex; align-items: center; gap: 8px; justify-content: center; border-radius: 10px; padding: 8px; }
         
-        .menu { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 10px; }
+        /* Двуредови бутони */
+        button { padding: 8px 15px; cursor: pointer; border: none; border-radius: 8px; color: white; transition: 0.2s; font-size: 0.8em; line-height: 1.3; font-weight: bold; min-width: 120px; }
+        button span { display: block; font-size: 1.2em; text-transform: uppercase; margin-top: 2px; letter-spacing: 1px; }
         
-        /* Заглавията вече не приличат на бутони */
-        .menu-section { grid-column: span 4; padding: 10px 0; font-size: 1.1em; font-weight: bold; margin-top: 15px; border-bottom: 2px solid #eee; text-align: left; }
+        button:hover { filter: brightness(1.1); transform: translateY(-1px); }
+        .active-mode { background: var(--dark) !important; box-shadow: inset 0 0 8px rgba(0,0,0,0.3); }
         
-        button { padding: 12px; cursor: pointer; border: none; border-radius: 8px; background: var(--accent); color: white; transition: 0.2s; font-weight: bold; }
-        button:hover { filter: brightness(1.1); transform: translateY(-2px); }
-        .active-mode { background: var(--dark) !important; box-shadow: 0 0 10px rgba(0,0,0,0.2); }
-        
-        /* Бутоните за тест са по-откроени */
-        .test-btn { border: 2px solid rgba(0,0,0,0.1); font-size: 1em; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .test-all { background: #f39c12 !important; grid-column: span 4; font-size: 1.2em; margin-top: 20px; padding: 20px; }
+        .btn-blue { background: var(--accent); }
+        .btn-purple { background: var(--purple); }
+        .btn-teal { background: var(--teal); }
+        .btn-test { font-style: italic; border: 1px solid rgba(255,255,255,0.3); }
+        .test-all { background: #f39c12 !important; font-size: 1.1em; padding: 15px; margin-top: 10px; width: 100%; max-width: 800px; margin-left: auto; margin-right: auto; }
         
         #error-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(231, 76, 60, 0.8); color: white; font-size: 300px; display: none; align-items: center; justify-content: center; z-index: 100; pointer-events: none; }
-        .result-popup { background: #ffd700; color: #000; padding: 25px; border-radius: 15px; margin: 20px 0; font-size: 1.4em; border: 5px solid var(--dark); text-align: center; }
+        .result-popup { background: #ffd700; color: #000; padding: 20px; border-radius: 15px; margin: 15px 0; font-size: 1.3em; border: 5px solid var(--dark); text-align: center; }
         .current-char { background: #f1c40f; color: black; }
     </style>
 </head>
 <body>
-
 <div id="error-overlay">X</div>
-
 <div id="container">
     <div id="setup">
         <h1>🏆 ШАМПИОНАТЪТ НА БОБИ</h1>
-        <p>Боби, тренирай буквите и после се състезавай за време!</p>
-        <button onclick="startApp()" style="padding: 15px 50px; font-size: 22px; background: var(--success);">ЗАПОЧНИ</button>
+        <button onclick="startApp()" style="padding: 15px 50px; font-size: 22px; background: var(--success); cursor:pointer; color:white; border:none; border-radius:10px;">ЗАПОЧНИ</button>
     </div>
-
     <div id="game" style="display:none">
         <div id="practice-area">
             <div id="input-history"></div>
             <div id="target-display">?</div>
         </div>
-
         <div id="speed-test-area">
             <div id="target-text-view"></div>
-            <textarea id="typing-box" spellcheck="false" placeholder="Започни да пишеш тук..."></textarea>
+            <textarea id="typing-box" spellcheck="false" placeholder="Пиши тук..."></textarea>
             <div id="result-display" class="result-popup" style="display:none"></div>
         </div>
-
         <div id="hint">Подготви се...</div>
-
+        
         <div class="menu">
-            <div class="menu-section" style="color: var(--accent);">🔵 ОСНОВЕН РЕД (СИН)</div>
-            <button onclick="changeLevel('char', ['о', 'т'], this)">О - Т</button>
-            <button onclick="changeLevel('char', ['н', 'а'], this)">Н - А</button>
-            <button onclick="changeLevel('char', ['в', 'я'], this)">В - Я</button>
-            <button class="test-btn" style="background:var(--accent)" onclick="initSpeedTest('mid', this)">🏁 ТЕСТ СИН</button>
+            <!-- СИН РЕД -->
+            <div class="row-group" style="background: rgba(52, 152, 219, 0.1);">
+                <button class="btn-blue" onclick="changeLevel('char', ['о', 'т'], this)">ПОКАЗАЛЦИ <span>О Т</span></button>
+                <button class="btn-blue" onclick="changeLevel('char', ['н', 'а'], this)">СРЕДНИ <span>Н А</span></button>
+                <button class="btn-blue" onclick="changeLevel('char', ['в', 'я'], this)">БЕЗИМЕННИ <span>В Я</span></button>
+                <button class="btn-blue" onclick="changeLevel('char', ['м', 'ь', 'ч'], this)">КУТРЕТА <span>М Ь Ч</span></button>
+                <button class="btn-blue btn-test" onclick="initSpeedTest('mid', this)">🏁 ТЕСТ <span>СИН</span></button>
+            </div>
+            
+            <!-- ЛИЛАВ РЕД -->
+            <div class="row-group" style="background: rgba(155, 89, 182, 0.1);">
+                <button class="btn-purple" onclick="changeLevel('char', ['и', 'ш'], this)">ПОКАЗАЛЦИ <span>И Ш</span></button>
+                <button class="btn-purple" onclick="changeLevel('char', ['е', 'щ'], this)">СРЕДНИ <span>Е Щ</span></button>
+                <button class="btn-purple" onclick="changeLevel('char', ['у', 'к'], this)">БЕЗИМЕННИ <span>У К</span></button>
+                <button class="btn-purple" onclick="changeLevel('char', ['ц', 'с'], this)">КУТРЕТА <span>Ц С</span></button>
+                <button class="btn-purple btn-test" onclick="initSpeedTest('top', this)">🏁 ТЕСТ <span>ЛИЛАВ</span></button>
+            </div>
+            
+            <!-- ЗЕЛЕН РЕД -->
+            <div class="row-group" style="background: rgba(22, 160, 133, 0.1);">
+                <button class="btn-teal" onclick="changeLevel('char', ['л', 'д'], this)">ПОКАЗАЛЦИ <span>Л Д</span></button>
+                <button class="btn-teal" onclick="changeLevel('char', ['р', 'з'], this)">СРЕДНИ <span>Р З</span></button>
+                <button class="btn-teal" onclick="changeLevel('char', ['п', 'й'], this)">БЕЗИМЕННИ <span>П Й</span></button>
+                <button class="btn-teal" onclick="changeLevel('char', ['ф', 'х'], this)">КУТРЕТА <span>Ф Х</span></button>
+                <button class="btn-teal btn-test" onclick="initSpeedTest('bot', this)">🏁 ТЕСТ <span>ЗЕЛЕН</span></button>
+            </div>
 
-            <div class="menu-section" style="color: var(--purple);">🟣 ГОРЕН РЕД (ЛИЛАВ)</div>
-            <button style="background:var(--purple)" onclick="changeLevel('char', ['и', 'ш'], this)">И - Ш</button>
-            <button style="background:var(--purple)" onclick="changeLevel('char', ['е', 'щ'], this)">Е - Щ</button>
-            <button style="background:var(--purple)" onclick="changeLevel('char', ['у', 'к'], this)">У - К</button>
-            <button class="test-btn" style="background:var(--purple)" onclick="initSpeedTest('top', this)">🏁 ТЕСТ ЛИЛАВ</button>
-
-            <div class="menu-section" style="color: var(--teal);">🟢 ДОЛЕН РЕД (ЗЕЛЕН)</div>
-            <button style="background:var(--teal)" onclick="changeLevel('char', ['л', 'д'], this)">Л - Д</button>
-            <button style="background:var(--teal)" onclick="changeLevel('char', ['р', 'з'], this)">Р - З</button>
-            <button style="background:var(--teal)" onclick="changeLevel('char', ['п', 'й'], this)">П - Й</button>
-            <button class="test-btn" style="background:var(--teal)" onclick="initSpeedTest('bot', this)">🏁 ТЕСТ ЗЕЛЕН</button>
-
-            <button class="test-all" onclick="initSpeedTest('all', this)">🏁🏎️ ГОЛЕМИЯТ ШАМПИОНАТ (ВСИЧКИ РЕДОВЕ)</button>
+            <button class="test-all" onclick="initSpeedTest('all', this)">🏎️ ГОЛЕМИЯТ ШАМПИОНАТ <span>ВСИЧКИ РЕДОВЕ</span></button>
         </div>
     </div>
 </div>
-
 <script>
-    let mode = 'char'; 
-    let currentPool = ['о', 'т'];
-    let targetTask = '';
-    let startTime = null;
-    let timerInterval = null;
-    let activeTestText = "";
-
+    let mode = 'char'; let currentPool = []; let targetTask = ''; let startTime = null; let timerInterval = null; let activeTestText = "";
     const texts = {
         mid: "ана вярва на таня. мачът на ваня е на гарата. мама готви на ната.",
         top: "кучето и котката скочиха. ще ядем ягоди и ябълки. тук е много шумно.",
         bot: "лекар даде разни хапчета. зимата дойде бързо. пази хляба от прах.",
         all: "бързото куче скочи над мързеливата котка. мама и тати отидоха на планина."
     };
-
-    function startApp() {
-        document.getElementById('setup').style.display = 'none';
-        document.getElementById('game').style.display = 'block';
-        changeLevel('char', ['о', 'т'], document.querySelector('.menu button'));
-    }
-
-    function changeLevel(newMode, data, btn) {
-        clearInterval(timerInterval);
-        mode = newMode;
-        currentPool = data;
-        document.getElementById('practice-area').style.display = 'block';
-        document.getElementById('speed-test-area').style.display = 'none';
-        document.getElementById('input-history').innerText = "";
-        document.getElementById('result-display').style.display = 'none';
-        document.querySelectorAll('button').forEach(b => b.classList.remove('active-mode'));
-        btn.classList.add('active-mode');
-        nextTask();
-    }
-
-    function nextTask() {
-        targetTask = currentPool[Math.floor(Math.random() * currentPool.length)];
-        document.getElementById('target-display').innerText = targetTask.toUpperCase();
-        document.getElementById('hint').innerText = "Пиши буквата...";
-    }
-
-    function initSpeedTest(testType, btn) {
-        clearInterval(timerInterval);
-        mode = 'speedtest';
-        activeTestText = texts[testType];
-        startTime = null;
-        document.getElementById('practice-area').style.display = 'none';
-        document.getElementById('speed-test-area').style.display = 'block';
-        document.getElementById('result-display').style.display = 'none';
-        document.getElementById('hint').innerText = "Натисни ENTER за край!";
-        document.querySelectorAll('button').forEach(b => b.classList.remove('active-mode'));
-        btn.classList.add('active-mode');
-        const box = document.getElementById('typing-box');
-        box.value = "";
-        renderSpeedTarget("");
-        setTimeout(() => box.focus(), 50);
-    }
-
+    function startApp() { document.getElementById('setup').style.display = 'none'; document.getElementById('game').style.display = 'block'; changeLevel('char', ['о', 'т'], document.querySelector('.menu button')); }
+    function changeLevel(newMode, data, btn) { clearInterval(timerInterval); mode = newMode; currentPool = data; document.getElementById('practice-area').style.display = 'block'; document.getElementById('speed-test-area').style.display = 'none'; document.getElementById('input-history').innerText = ""; document.getElementById('result-display').style.display = 'none'; document.querySelectorAll('button').forEach(b => b.classList.remove('active-mode')); btn.classList.add('active-mode'); nextTask(); }
+    function nextTask() { targetTask = currentPool[Math.floor(Math.random() * currentPool.length)]; document.getElementById('target-display').innerText = targetTask.toUpperCase(); document.getElementById('hint').innerText = "Пиши буквата..."; }
+    function initSpeedTest(testType, btn) { clearInterval(timerInterval); mode = 'speedtest'; activeTestText = texts[testType]; startTime = null; document.getElementById('practice-area').style.display = 'none'; document.getElementById('speed-test-area').style.display = 'block'; document.getElementById('result-display').style.display = 'none'; document.getElementById('hint').innerText = "ENTER за край!"; document.querySelectorAll('button').forEach(b => b.classList.remove('active-mode')); btn.classList.add('active-mode'); const box = document.getElementById('typing-box'); box.value = ""; renderSpeedTarget(""); setTimeout(() => box.focus(), 50); }
     function renderSpeedTarget(typed) {
         let html = "";
         for (let i = 0; i < activeTestText.length; i++) {
             if (i < typed.length) {
                 let color = (typed[i] === activeTestText[i]) ? "color: #27ae60" : "color: #e74c3c; text-decoration: underline";
                 html += `<span style="${color}">${activeTestText[i]}</span>`;
-            } else if (i === typed.length) {
-                html += `<span class="current-char">${activeTestText[i]}</span>`;
-            } else { html += `<span>${activeTestText[i]}</span>`; }
+            } else if (i === typed.length) { html += `<span class="current-char">${activeTestText[i]}</span>`; }
+            else { html += `<span>${activeTestText[i]}</span>`; }
         }
         document.getElementById('target-text-view').innerHTML = html;
     }
-
     window.onkeydown = function(e) {
         if (document.getElementById('game').style.display === 'none') return;
         if (mode === 'speedtest') {
             const box = document.getElementById('typing-box');
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                finishSpeedTest();
-                return;
-            }
+            if (e.key === 'Enter') { e.preventDefault(); finishSpeedTest(); return; }
             if (!startTime && e.key.length === 1) startTime = Date.now();
             setTimeout(() => renderSpeedTarget(box.value), 10);
             return;
@@ -176,23 +129,19 @@
             nextTask();
         } else { showError(); }
     };
-
     function finishSpeedTest() {
         if (!startTime) return;
         const typed = document.getElementById('typing-box').value;
         const totalMinutes = (Date.now() - startTime) / 60000;
         let errors = 0;
-        for (let i = 0; i < activeTestText.length; i++) {
-            if (typed[i] !== activeTestText[i]) errors++;
-        }
+        for (let i = 0; i < activeTestText.length; i++) { if (typed[i] !== activeTestText[i]) errors++; }
         let netHits = typed.length - (errors * 10);
         if (netHits < 0) netHits = 0;
         let wpm = Math.round(netHits / (totalMinutes || 1));
         const res = document.getElementById('result-display');
         res.style.display = 'block';
-        res.innerHTML = `🏁 РЕЗУЛТАТ: <b>${wpm} чисти удара/мин</b><br><small>Удари: ${typed.length} | Грешки: ${errors}</small>`;
+        res.innerHTML = `🏁 <b>${wpm} удара/мин</b> <br><small>Удари: ${typed.length} | Грешки: ${errors}</small>`;
     }
-
     function showError() {
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         let osc = audioCtx.createOscillator(); osc.type = 'sawtooth'; osc.frequency.value = 130;
